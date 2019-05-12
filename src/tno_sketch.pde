@@ -53,9 +53,7 @@ void setup() {
   if (int(isweb_string[0]) == 1){
      isweb = true; 
      data_dir = "data/";
-  }
-  println("isweb = ", isweb);
-  
+  }  
   
   //Simulation settings
   scaling = 6.0;  //How to scale orbital distances
@@ -153,9 +151,11 @@ void setup() {
       maxa = a_au;
     }
   }
-  println("maxrad = ", maxrad);
-  println("maxa = ", maxa);
-  println("Number of bodies above min rad = ", i);
+  if (!isweb){
+    println("maxrad = ", maxrad);
+    println("maxa = ", maxa);
+    println("Number of bodies above min rad = ", i);
+  }
   npart = i;
  
   //Load planet data
