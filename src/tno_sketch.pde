@@ -367,6 +367,10 @@ void draw() {
 
   //fixed view
   boolean do_moving_view = true;
+  if (isweb){
+     do_moving_view = false; 
+  }
+  
   if (!do_moving_view) {
     camera(width/2.0, height/2.0, -500.0, 0., 0., 0., 0, 1, 0);
     //rotateY( - PI/4 + 0.2);
