@@ -21,6 +21,9 @@ float t;
 float dt;
 float t0;
 
+int inc_x;
+int inc_y;
+
 //Scaling of plot relative to physical units
 float scaling;
 
@@ -54,6 +57,9 @@ void setup() {
      isweb = true; 
      data_dir = "data/";
   }  
+  
+  mx = width;
+  my = height/2;
   
   //Simulation settings
   scaling = 6.0;  //How to scale orbital distances
@@ -97,6 +103,10 @@ void setup() {
   float[] inc_arr_temp = new float[nstart]; 
   float[] M0_arr_temp = new float[nstart]; 
   float[] r_arr_temp = new float[nstart];
+  
+  //keyboard control
+  inc_x = 0;
+  inc_y = 0;
 
   //Load TNO data
   float maxrad = 0.0;
@@ -359,16 +369,18 @@ void draw() {
   lights();
   directionalLight(128, 128, 128, 0, 0, 1);
 
+  //fixed view
+  boolean do_moving_view = true;
+
   //Determine camera position and angle, etc.
-  if (!tracking) {
+  if (!tracking & !isweb) {
     mx = mouseX;
     my = mouseY;
   }
-
-  //fixed view
-  boolean do_moving_view = true;
+  
   if (isweb){
-     do_moving_view = false; 
+    mx = mx + inc_x;
+    my = my + inc_y;
   }
   
   if (!do_moving_view) {
@@ -388,7 +400,7 @@ void draw() {
     perspective(fov, aspect, cameraZ/10.0, cameraZ*10.0);
   }
 
-  if (mousePressed) {
+  if (mousePressed & !isweb) {
     if (!tracking) {
       mousestartx = mouseX;
       mousestarty = mouseY;
@@ -446,4 +458,29 @@ float arctan2(float y, float x) {
     returnval = -pi/2.0;
   }
   return returnval;
+}
+
+void keyPressed()
+{
+  // If the key is between 'A'(65) to 'Z' and 'a' to 'z'(122)
+  int deltax = 10;
+  int deltay = 10; 
+  if(key == 'i') {
+    inc_y = 10;  
+  }
+  if(key == 'k') {
+    inc_y = -10;
+  }
+  if(key == 'j') {
+    inc_x = -10;
+  }
+  if(key == 'l') {
+    inc_x = 10;
+  }
+
+}
+
+void keyReleased(){
+   inc_x = 0;
+   inc_y = 0;
 }
