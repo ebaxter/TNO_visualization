@@ -1,4 +1,5 @@
 String data_dir = "../data/";
+boolean isweb;
 
 int npart; //number of TNOs
 int nplanet = 9; //number of planets
@@ -43,6 +44,17 @@ float sun_radius = 5.0;  //how large the Sun appears
 
 void setup() {
   size(700, 700, P3D);
+  
+  //Determine whether running on web
+  String[] isweb_string = loadStrings("isweb.txt");
+  if (int(isweb_string[0]) == 0){
+     isweb = false; 
+  }
+  if (int(isweb_string[0]) == 1){
+     isweb = true; 
+  }
+  println("isweb = ", isweb);
+  
   
   //Simulation settings
   scaling = 6.0;  //How to scale orbital distances
