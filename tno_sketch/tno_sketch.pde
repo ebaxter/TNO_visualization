@@ -52,6 +52,7 @@ void setup() {
   }
   if (int(isweb_string[0]) == 1){
      isweb = true; 
+     data_dir = "data/";
   }
   println("isweb = ", isweb);
   
