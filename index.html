@@ -1,7 +1,32 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
 <html>
-<title>
-3D visualization of TNOs and Planets in the solar system
-</title>
-<body>
-Testing
-</body>
+  <head>
+    <title>Interactive TNO and planet visualization</title>
+<script type="text/javascript" src="./src/processing.min.js"></script>
+
+  </head>
+
+<style type="text/css">
+.title {
+    text-align: center;
+width: 800px;
+    margin:auto;
+}
+
+#theCanvas {
+width: 1200px;
+margin: auto;
+border: 5px solid black;
+display: block;
+}
+</style>
+
+Interactive visualization of TNOs and planets in the solar system.
+
+<div class="title">
+<canvas "theCanvas" data-processing-sources="./src/tno_sketch.pde"></canvas>
+</div>
+
+  </body>
+</html>
