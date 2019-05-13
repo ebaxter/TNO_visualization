@@ -1,5 +1,9 @@
 String data_dir = "../data/";
 boolean isweb;
+boolean first_view;
+
+int the_width = 700;
+int the_height = 700;
 
 int npart; //number of TNOs
 int nplanet = 9; //number of planets
@@ -34,8 +38,8 @@ float centerz;
 
 //For keeping track of mouse position
 boolean tracking;
-float mousestartx = 0.;
-float mousestarty = 0.;
+float mousestartx;
+float mousestarty;
 float mx;
 float my;
 
@@ -48,6 +52,8 @@ float sun_radius = 5.0;  //how large the Sun appears
 void setup() {
   size(700, 700, P3D);
   
+  first_view = true;
+  
   //Determine whether running on web
   String[] isweb_string = loadStrings("isweb.txt");
   if (int(isweb_string[0]) == 0){
@@ -58,9 +64,11 @@ void setup() {
      data_dir = "data/";
   }  
   
-  mx = width;
-  my = height/2;
-  
+  mx = the_width;
+  my = the_height/2;
+  mousestartx = mx;
+  mousestarty = my;
+   
   //Simulation settings
   scaling = 6.0;  //How to scale orbital distances
   float radius_scaling = 150.0;  //How large to make the spheres when plotting
@@ -231,7 +239,6 @@ void setup() {
 
   frameRate(20);
   noStroke();  
-  camera(width/2.0, height/2.0, -500.0, 0., 0., 0., 0, 1, 0);
 }
 
 void update_positions(float t, float t0) {
@@ -368,7 +375,7 @@ void draw() {
   background(0);
   lights();
   directionalLight(128, 128, 128, 0, 0, 1);
-
+  
   //fixed view
   boolean do_moving_view = true;
 
@@ -384,18 +391,18 @@ void draw() {
   }
   
   if (!do_moving_view) {
-    camera(width/2.0, height/2.0, -500.0, 0., 0., 0., 0, 1, 0);
+    camera(the_width/2.0, the_height/2.0, -500.0, 0., 0., 0., 0, 1, 0);
     //rotateY( - PI/4 + 0.2);
   }
 
   //Moving view
   if (do_moving_view) {
-    float cameraY = height/2.0;
-    float fov = my/float(width) * PI/2;
+    camera(the_width/2.0, the_height/2.0, -500.0, 0., 0., 0., 0, 1, 0);
+    float cameraY = the_height/2.0;
+    float fov = my/float(the_width) * PI/2;
     float cameraZ = cameraY / tan(fov / 2.0);
-    float aspect = float(width)/float(height);
+    float aspect = float(the_width)/float(the_height);
     sun_radius = fov*10.0;
-
     rotateY(mx/float(width)* PI - PI/4 + 0.2);  //This setting gets nice agreement between mouse position and viewing angle
     perspective(fov, aspect, cameraZ/10.0, cameraZ*10.0);
   }
