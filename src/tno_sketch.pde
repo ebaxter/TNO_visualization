@@ -7,6 +7,7 @@ int the_height = 700;
 
 int npart; //number of TNOs
 int nplanet = 9; //number of planets
+int ndes = 0;
 
 float[] xx; //positions of objects
 float[] yy; 
@@ -49,6 +50,8 @@ float mu = 1.32712440041e20;
 float AU_to_m = 1.49597870691e11;  // Unit conversion
 float sun_radius = 5.0;  //how large the Sun appears
 
+boolean do_des = false;
+
 void setup() {
   size(700, 700, P3D);
   
@@ -88,7 +91,15 @@ void setup() {
   String[] lines = loadStrings(data_dir + "Distant.txt");
   String[] rad_lines = loadStrings(data_dir + "tno_radii.dat");
   String[] planet_lines = loadStrings(data_dir + "planet_orbital.dat");
-
+  String des_filename = "deselements_fake.dat";
+  if (do_des){
+     des_filename = "deselements.dat"; 
+  }
+  String[] des_lines = loadStrings(data_dir + des_filename);
+  if (do_des){
+    ndes = des_lines.length - 1;
+  }
+  
   //number of TNOs
   npart = lines.length - 1;
 
@@ -198,17 +209,41 @@ void setup() {
       r_arr_pl[jj-1] = 2.0;
   }
 
+  //Load DES data
+  float[] a_arr_des = new float[ndes]; //semi major axis, m
+  float[] e_arr_des = new float[ndes]; //eccentricity
+  float[] lilomega_arr_des = new float[ndes]; //argument of periapsis [radians]
+  float[] bigomega_arr_des = new float[ndes]; //longitude of ascending node [radians]
+  float[] inc_arr_des = new float[ndes]; //inclination [radians]
+  float[] M0_arr_des = new float[ndes]; //Mean anomaly
+  float[] r_arr_des = new float[ndes]; //Diameter [m?]
+  if (do_des){    
+    for (int jj = 1; jj <= ndes; jj++){
+        println("jj = ", jj);
+        String[] des_split = split(des_lines[jj]," ");
+        a_arr_des[jj-1] = float(des_split[2])*AU_to_m;
+        e_arr_des[jj-1] = float(des_split[3]);
+        inc_arr_des[jj-1] = float(des_split[4])*pi/180.;
+        bigomega_arr_des[jj-1] = float(des_split[5])*pi/180.;
+        lilomega_arr_des[jj-1] = (float(des_split[6]) - float(des_split[5]))*pi/180.;
+        //Is this correct?  Is MO same as mean longitude?
+        M0_arr_des[jj-1] = float(des_split[12])*pi/180.;
+        r_arr_des[jj-1] = 2.0;
+    }
+  }
+
+
   //Combine TNO and planet data into single arrays
-  a_arr = new float[npart + nplanet]; //semi major axis, m
-  e_arr = new float[npart + nplanet]; //eccentricity
-  lilomega_arr = new float[npart + nplanet]; //argument of periapsis [radians]
-  bigomega_arr = new float[npart + nplanet]; //longitude of ascending node [radians]
-  inc_arr = new float[npart + nplanet]; //inclination [radians]
-  M0_arr = new float[npart + nplanet]; //Mean anomaly
-  r_arr = new float[npart + nplanet]; //Diameter [m?]
-  for (int j = 0; j < npart + nplanet; j++){
+  a_arr = new float[npart + nplanet + ndes]; //semi major axis, m
+  e_arr = new float[npart + nplanet + ndes]; //eccentricity
+  lilomega_arr = new float[npart + nplanet + ndes]; //argument of periapsis [radians]
+  bigomega_arr = new float[npart + nplanet + ndes]; //longitude of ascending node [radians]
+  inc_arr = new float[npart + nplanet + ndes]; //inclination [radians]
+  M0_arr = new float[npart + nplanet + ndes]; //Mean anomaly
+  r_arr = new float[npart + nplanet + ndes]; //Diameter [m?]
+  for (int j = 0; j < npart + nplanet + ndes; j++){
       if (j < nplanet){
-        r_arr[j] = r_arr_temp[j];
+        r_arr[j] = r_arr_pl[j];
         a_arr[j] = a_arr_pl[j];
         e_arr[j] = e_arr_pl[j];
         lilomega_arr[j] = lilomega_arr_pl[j];
@@ -217,7 +252,7 @@ void setup() {
         M0_arr[j] = M0_arr_pl[j];
         r_arr[j] = r_arr_pl[j];
       }
-      if (j >= nplanet){
+      if (j >= nplanet & j < nplanet + npart){
         r_arr[j] = r_arr_temp[j-nplanet];
         a_arr[j] = a_arr_temp[j-nplanet];
         e_arr[j] = e_arr_temp[j-nplanet];
@@ -226,15 +261,25 @@ void setup() {
         inc_arr[j] = inc_arr_temp[j-nplanet];
         M0_arr[j] = M0_arr_temp[j-nplanet];
       }
+      if (j >= nplanet + npart){
+        r_arr[j] = r_arr_des[j - nplanet - npart];
+        a_arr[j] = a_arr_des[j - nplanet - npart];
+        e_arr[j] = e_arr_des[j - nplanet - npart];
+        lilomega_arr[j] = lilomega_arr_des[j - nplanet - npart];
+        bigomega_arr[j] = bigomega_arr_des[j - nplanet - npart];
+        inc_arr[j] = inc_arr_des[j - nplanet - npart];
+        M0_arr[j] = M0_arr_des[j - nplanet - npart];
+        r_arr[j] = r_arr_des[j - nplanet - npart];
+      }
   }
 
   //initialize positions
-  xx = new float[npart + nplanet];
-  yy = new float[npart + nplanet];
-  zz = new float[npart + nplanet];
-  xdot = new float[npart + nplanet];
-  ydot = new float[npart + nplanet];
-  zdot = new float[npart + nplanet];
+  xx = new float[npart + nplanet + ndes];
+  yy = new float[npart + nplanet + ndes];
+  zz = new float[npart + nplanet + ndes];
+  xdot = new float[npart + nplanet + ndes];
+  ydot = new float[npart + nplanet + ndes];
+  zdot = new float[npart + nplanet + ndes];
   update_positions(t, t0);
 
   frameRate(20);
@@ -245,7 +290,7 @@ void update_positions(float t, float t0) {
   float[] rt = new float[3];
   float[] rtdot = new float[3];
 
-  for (int i = 0; i < npart + nplanet; i++) {
+  for (int i = 0; i < npart + nplanet + ndes; i++) {
     rt = get_pos(t, t0, M0_arr[i], a_arr[i], e_arr[i], lilomega_arr[i], bigomega_arr[i], inc_arr[i]);
     //rtdot = get_posdot(t, t0, M0_arr[i], a_arr[i], e_arr[i], lilomega_arr[i], bigomega_arr[i], inc_arr[i]);
     xx[i] = rt[0];
@@ -427,9 +472,13 @@ void draw() {
   fill(planet_color);
  
   //Draw the spheres
-  for (int i = 0; i < npart + nplanet; i++) {
-    if (i >= nplanet){
+  for (int i = 0; i < npart + nplanet + ndes; i++) {
+    if (i >= nplanet & i < npart + nplanet){
       color tno_color = #00BCFF;
+      fill(tno_color);
+    }
+    if (i >= nplanet + npart){
+      color tno_color = #11FF00;
       fill(tno_color);
     }
     translate(xx[i]*scaling, yy[i]*scaling, zz[i]*scaling);
